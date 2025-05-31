@@ -85,12 +85,18 @@ jobs:
             fi
           done
 
+      - name: Pull latest changes
+        if: steps.git-check.outputs.changes == 'true'
+        run: |
+          git fetch origin
+          git pull origin main --rebase || git pull origin main --allow-unrelated-histories
+
       - name: Commit and push changes
         if: steps.git-check.outputs.changes == 'true'
         run: |
           git add .
           git commit -m "chore: auto update $(date +'%Y-%m-%d')"
-          git push
+          git push origin main
 
       - name: Create Release
         if: steps.git-check.outputs.changes == 'true'

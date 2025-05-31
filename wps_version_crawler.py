@@ -396,6 +396,17 @@ class WPSVersionCrawler:
             downloaded_file = None
             release_date = None
             
+            # 检查本地版本信息
+            local_version_file = os.path.join(self.versions_dir, "windows", "windows.yaml")
+            if os.path.exists(local_version_file):
+                try:
+                    with open(local_version_file, 'r', encoding='utf-8') as f:
+                        local_info = yaml.safe_load(f)
+                        if local_info and "version" in local_info:
+                            logger.info(f"本地已存在版本: {local_info['version']}")
+                except Exception as e:
+                    logger.warning(f"读取本地版本信息失败: {str(e)}")
+            
             # 尝试不同的版本号模式
             for version in range(21171, 21160, -1):  # 从最新版本开始尝试
                 # 尝试 32 位版本
@@ -406,11 +417,17 @@ class WPSVersionCrawler:
                 if self._verify_download_url(url_64):
                     latest_version = str(version)
                     download_url = url_64
+                    
+                    # 检查版本是否需要更新
+                    if local_info and local_info.get("version") == latest_version:
+                        logger.info(f"Windows 版本 {latest_version} 已是最新，跳过下载")
+                        return local_info
+                    
                     # 下载文件
                     filename = self._generate_filename("Windows", latest_version, release_date=release_date)
                     save_path = os.path.join(self.downloads_dir, "windows", filename)
                     
-                    logger.info(f"开始下载文件: {filename}")
+                    logger.info(f"发现新版本 {latest_version}，开始下载文件: {filename}")
                     if self.downloader.download_file(url_64, save_path):
                         logger.info(f"文件下载完成: {filename}")
                         downloaded_file = save_path
@@ -418,11 +435,17 @@ class WPSVersionCrawler:
                 elif self._verify_download_url(url_32):
                     latest_version = str(version)
                     download_url = url_32
+                    
+                    # 检查版本是否需要更新
+                    if local_info and local_info.get("version") == latest_version:
+                        logger.info(f"Windows 版本 {latest_version} 已是最新，跳过下载")
+                        return local_info
+                    
                     # 下载文件
                     filename = self._generate_filename("Windows", latest_version, release_date=release_date)
                     save_path = os.path.join(self.downloads_dir, "windows", filename)
                     
-                    logger.info(f"开始下载文件: {filename}")
+                    logger.info(f"发现新版本 {latest_version}，开始下载文件: {filename}")
                     if self.downloader.download_file(url_32, save_path):
                         logger.info(f"文件下载完成: {filename}")
                         downloaded_file = save_path
@@ -461,12 +484,24 @@ class WPSVersionCrawler:
         max_retries = 3
         retry_count = 0
         
+        # 检查本地版本信息
+        local_version_file = os.path.join(self.versions_dir, "macos", "macos.yaml")
+        local_info = None
+        if os.path.exists(local_version_file):
+            try:
+                with open(local_version_file, 'r', encoding='utf-8') as f:
+                    local_info = yaml.safe_load(f)
+                    if local_info and "version" in local_info:
+                        logger.info(f"本地已存在版本: {local_info['version']}")
+            except Exception as e:
+                logger.warning(f"读取本地版本信息失败: {str(e)}")
+        
         while retry_count < max_retries:
             try:
                 with sync_playwright() as p:
                     browser = p.chromium.launch(
                         timeout=60000,
-                        headless=True  # 使用无头模式
+                        headless=True
                     )
                     context = browser.new_context(
                         viewport={'width': 1920, 'height': 1080},
@@ -516,7 +551,6 @@ class WPSVersionCrawler:
                                 logger.info(f"使用选择器 {selector} 找到版本信息: {version_text}")
                                 
                                 # 尝试从版本信息中提取日期
-                                # 格式可能是: "7.5.1(8994)/2025.05.30" 或 "7.5.1(8994) 2025.05.30"
                                 date_match = re.search(r'[/\s](\d{4}\.\d{2}\.\d{2})', version_text)
                                 if date_match:
                                     release_date = date_match.group(1).replace('.', '-')
@@ -543,6 +577,12 @@ class WPSVersionCrawler:
                         
                         logger.info(f"解析到版本号: {version}, 构建号: {build_number}")
                         
+                        # 检查版本是否需要更新
+                        if local_info and local_info.get("version") == version and local_info.get("build_number") == build_number:
+                            logger.info(f"macOS 版本 {version}({build_number}) 已是最新，跳过下载")
+                            browser.close()
+                            return local_info
+                        
                         # 获取下载链接
                         logger.info("正在查找下载按钮...")
                         download_button = None
@@ -568,7 +608,7 @@ class WPSVersionCrawler:
                             # 点击下载按钮，触发下载链接生成
                             logger.info("点击下载按钮...")
                             download_button.click()
-                            page.wait_for_timeout(2000)  # 减少等待时间
+                            page.wait_for_timeout(2000)
                             
                             # 从捕获的URL中查找下载链接
                             download_url = None
@@ -593,7 +633,7 @@ class WPSVersionCrawler:
                                 filename = self._generate_filename("macOS", version, build_number, release_date)
                                 save_path = os.path.join(self.downloads_dir, "macos", filename)
                                 
-                                logger.info(f"开始下载文件: {filename}")
+                                logger.info(f"发现新版本 {version}({build_number})，开始下载文件: {filename}")
                                 if self.downloader.download_file(download_url, save_path):
                                     logger.info(f"文件下载完成: {filename}")
                                     downloaded = True
