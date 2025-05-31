@@ -1,0 +1,6 @@
+platform: Windows
+version: '21171'
+download_url: https://official-package.wpscdn.cn/wps/download/WPS_Setup_21171.exe
+update_time: '2025-05-31 12:35:33'
+local_file: downloads\windows\WPS_Office_21171.exe
+file_hash: e57a484b13ab5f44786a2b6f8e55250e9b6bf703d5a604ccf5f2a5ba72820989

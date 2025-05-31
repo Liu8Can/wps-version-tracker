@@ -1,0 +1,23 @@
+{
+  "windows": [
+    {
+      "platform": "Windows",
+      "version": "21171",
+      "download_url": "https://official-package.wpscdn.cn/wps/download/WPS_Setup_21171.exe",
+      "update_time": "2025-05-31 12:35:33",
+      "local_file": "downloads\\windows\\WPS_Office_21171.exe",
+      "file_hash": "e57a484b13ab5f44786a2b6f8e55250e9b6bf703d5a604ccf5f2a5ba72820989"
+    }
+  ],
+  "macos": [
+    {
+      "platform": "macOS",
+      "version": "7.5.1",
+      "build_number": "8994",
+      "download_url": "https://package.mac.wpscdn.cn/mac_wps_pkg/wps_installer/WPS_Office_Installer.zip",
+      "update_time": "2025-05-31 12:38:42",
+      "local_file": "downloads\\macos\\WPS_Office_7.5.1_8994.zip",
+      "file_hash": "3fb4c61c4021935b6725986e744e4e00bfa7928accc50ba1c9f27f22132e5a12"
+    }
+  ]
+}
