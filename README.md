@@ -1,5 +1,13 @@
 # WPS Version Tracker
 
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/Liu8Can/wps-version-tracker)](https://github.com/Liu8Can/wps-version-tracker/releases)
+[![GitHub](https://img.shields.io/github/license/Liu8Can/wps-version-tracker)](https://github.com/Liu8Can/wps-version-tracker/blob/main/LICENSE)
+[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/downloads/)
+[![GitHub Actions](https://img.shields.io/github/actions/workflow/status/Liu8Can/wps-version-tracker/auto-update.yml?branch=main)](https://github.com/Liu8Can/wps-version-tracker/actions)
+[![GitHub last commit](https://img.shields.io/github/last-commit/Liu8Can/wps-version-tracker)](https://github.com/Liu8Can/wps-version-tracker/commits/main)
+[![GitHub stars](https://img.shields.io/github/stars/Liu8Can/wps-version-tracker?style=social)](https://github.com/Liu8Can/wps-version-tracker/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/Liu8Can/wps-version-tracker?style=social)](https://github.com/Liu8Can/wps-version-tracker/network/members)
+
 一个用于自动追踪和下载 WPS Office 最新版本的 Python 工具。支持 Windows 和 macOS 平台，提供多线程下载、版本历史记录和自动化更新功能。
 
 ## 🌟 功能特性
