@@ -1,7 +1,5 @@
 platform: macOS
-version: 7.5.1
-build_number: '8994'
-download_url: https://package.mac.wpscdn.cn/mac_wps_pkg/wps_installer/WPS_Office_Installer.zip
-update_time: '2025-05-31 12:38:42'
-local_file: downloads\macos\WPS_Office_7.5.1_8994.zip
-file_hash: 3fb4c61c4021935b6725986e744e4e00bfa7928accc50ba1c9f27f22132e5a12
+version: Unknown
+download_url: null
+update_time: '2025-06-23 01:33:28'
+error: 无法获取版本信息或下载链接
