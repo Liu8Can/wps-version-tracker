@@ -1,5 +1,5 @@
 platform: macOS
 version: Unknown
 download_url: null
-update_time: '2025-06-30 01:30:41'
-error: 无法获取版本信息或下载链接
+update_time: '2025-07-07 01:31:15'
+error: Timeout 60000ms exceeded.
