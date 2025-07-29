@@ -31,7 +31,7 @@
 
 - **自动化功能**
   - GitHub Actions 自动运行
-  - 每日自动检查更新
+  - 每周自动检查更新
   - 自动提交新版本到仓库
   - 自动生成更新日志
 
@@ -90,7 +90,7 @@ MAX_RETRIES=5               # 最大重试次数
 
 # 自动化设置
 AUTO_UPDATE=true            # 启用自动更新
-UPDATE_INTERVAL=24          # 更新检查间隔（小时）
+UPDATE_INTERVAL=168         # 更新检查间隔（小时，168=7天）
 ```
 
 ### GitHub Actions 配置
@@ -105,7 +105,7 @@ UPDATE_INTERVAL=24          # 更新检查间隔（小时）
 ## 🔄 自动化流程
 
 1. **定时检查**
-   - 每天 UTC 时间 00:00 自动运行
+   - 每周一 UTC 时间 00:00 自动运行
    - 检查 Windows 和 macOS 版本更新
 
 2. **版本检测**

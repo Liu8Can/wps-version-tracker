@@ -43,6 +43,17 @@ jobs:
         run: python wps_version_crawler.py
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+        id: run_crawler
+        
+      - name: Retry on failure
+        if: steps.run_crawler.outcome == 'failure'
+        run: |
+          echo "首次运行失败，等待 30 秒后重试..."
+          sleep 30
+          python wps_version_crawler.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check for changes
         id: git-check
@@ -98,10 +109,16 @@ jobs:
           git commit -m "chore: auto update $(date +'%Y-%m-%d')"
           git push origin main
 
+      - name: Set release date
+        if: steps.git-check.outputs.changes == 'true'
+        id: date
+        run: echo "release_date=$(date +'%Y.%m.%d')" >> $GITHUB_OUTPUT
+
       - name: Create Release
         if: steps.git-check.outputs.changes == 'true'
         uses: softprops/action-gh-release@v1
         with:
+          tag_name: v${{ steps.date.outputs.release_date }}
           files: |
             downloads/**/*.exe
             downloads/**/*.zip

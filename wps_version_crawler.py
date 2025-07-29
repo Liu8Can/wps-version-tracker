@@ -23,11 +23,14 @@ import asyncio
 from urllib.parse import urlparse
 
 # 配置日志
+# 确保logs目录存在
+os.makedirs('logs', exist_ok=True)
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('wps_crawler.log', encoding='utf-8'),
+        logging.FileHandler('logs/wps_crawler.log', encoding='utf-8'),
         logging.StreamHandler()
     ]
 )
@@ -726,7 +729,11 @@ class WPSVersionCrawler:
             try:
                 logger.info(f"开始抓取 {platform} 版本信息...")
                 version_info = crawler_func()
-                self.save_version_info(platform, version_info)
+                # 确保版本信息有效再保存
+                if version_info and "version" in version_info and version_info["version"] != "Unknown":
+                    self.save_version_info(platform, version_info)
+                else:
+                    logger.error(f"{platform} 版本信息无效或获取失败，跳过保存")
             except Exception as e:
                 logger.error(f"抓取 {platform} 版本信息时发生错误: {str(e)}")
 
