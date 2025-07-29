@@ -512,8 +512,9 @@ class WPSVersionCrawler:
                     )
                     
                     page = context.new_page()
-                    page.set_default_timeout(60000)
-                    page.set_default_navigation_timeout(60000)
+                    # 减少超时时间，避免资源浪费
+                    page.set_default_timeout(15000)
+                    page.set_default_navigation_timeout(30000)
                     
                     # 设置请求拦截
                     self.captured_urls.clear()
@@ -540,7 +541,13 @@ class WPSVersionCrawler:
                     version_text = None
                     release_date = None
                     selectors = [
+                        # 匹配当前格式 "12.1.21861/2025.06.20"
+                        "text=/\\d+\\.\\d+\\.\\d+\\/\\d+\\.\\d+\\.\\d+/",
+                        # 匹配旧格式 "7.5.1(8994)"
                         "text=/\\d+\\.\\d+\\.\\d+\\(\\d+\\)/",
+                        # 通用选择器
+                        "//div[contains(text(), '/20')]",
+                        "//span[contains(text(), '/20')]",
                         "//div[contains(@class, 'version')]",
                         "//span[contains(text(), '版本')]",
                         "//div[contains(@class, 'download')]//span[contains(text(), '.')]"
@@ -565,20 +572,29 @@ class WPSVersionCrawler:
                     
                     if version_text:
                         # 尝试多种版本号格式
-                        version_match = re.search(r'(\d+\.\d+\.\d+)\((\d+)\)', version_text)
-                        if not version_match:
-                            # 尝试其他格式
-                            version_match = re.search(r'(\d+\.\d+\.\d+)', version_text)
+                        # 尝试匹配 "12.1.21861/2025.06.20" 格式
+                        version_match = re.search(r'(\d+\.\d+\.\d+)\/(\d+\.\d+\.\d+)', version_text)
+                        if version_match:
+                            version = version_match.group(1)
+                            release_date = version_match.group(2).replace('.', '-')
+                            build_number = "0"  # 如果没有构建号，使用0
+                            logger.info(f"解析到版本号: {version}, 发布日期: {release_date}")
+                        else:
+                            # 尝试匹配 "7.5.1(8994)" 格式
+                            version_match = re.search(r'(\d+\.\d+\.\d+)\((\d+)\)', version_text)
                             if version_match:
                                 version = version_match.group(1)
-                                build_number = "0"  # 如果没有构建号，使用0
+                                build_number = version_match.group(2)
+                                logger.info(f"解析到版本号: {version}, 构建号: {build_number}")
                             else:
-                                raise Exception(f"无法解析版本号: {version_text}")
-                        else:
-                            version = version_match.group(1)
-                            build_number = version_match.group(2)
-                        
-                        logger.info(f"解析到版本号: {version}, 构建号: {build_number}")
+                                # 尝试匹配任何版本号格式
+                                version_match = re.search(r'(\d+\.\d+\.\d+)', version_text)
+                                if version_match:
+                                    version = version_match.group(1)
+                                    build_number = "0"  # 如果没有构建号，使用0
+                                    logger.info(f"解析到版本号: {version}")
+                                else:
+                                    raise Exception(f"无法解析版本号: {version_text}")
                         
                         # 检查版本是否需要更新
                         if local_info and local_info.get("version") == version and local_info.get("build_number") == build_number:
@@ -613,11 +629,11 @@ class WPSVersionCrawler:
                             download_button.click()
                             page.wait_for_timeout(2000)
                             
-                            # 从捕获的URL中查找下载链接
+                                                            # 从捕获的URL中查找下载链接
                             download_url = None
                             for url in self.captured_urls:
                                 # 选择完整的安装包链接，而不是目录链接
-                                if url.endswith('.zip') and 'wpscdn.cn' in url and 'WPS_Office_Installer.zip' in url:
+                                if url.endswith('.zip') and 'wpscdn.cn' in url:
                                     download_url = url
                                     logger.info(f"找到下载链接: {url}")
                                     break
