@@ -401,6 +401,7 @@ class WPSVersionCrawler:
             
             # 检查本地版本信息
             local_version_file = os.path.join(self.versions_dir, "windows", "windows.yaml")
+            local_info = None
             if os.path.exists(local_version_file):
                 try:
                     with open(local_version_file, 'r', encoding='utf-8') as f:
@@ -410,16 +411,72 @@ class WPSVersionCrawler:
                 except Exception as e:
                     logger.warning(f"读取本地版本信息失败: {str(e)}")
             
-            # 尝试不同的版本号模式
-            for version in range(21171, 21160, -1):  # 从最新版本开始尝试
-                # 尝试 32 位版本
-                url_32 = f"{self.windows_download_base_url}/WPS_Setup_{version}.exe"
-                # 尝试 64 位版本
-                url_64 = f"{self.windows_download_base_url}/WPS_Setup_X64_{version}.exe"
-                
-                if self._verify_download_url(url_64):
-                    latest_version = str(version)
-                    download_url = url_64
+            # 尝试从中文官网获取最新版本
+            try:
+                with sync_playwright() as p:
+                    browser = p.chromium.launch(headless=True)
+                    context = browser.new_context(
+                        viewport={'width': 1920, 'height': 1080},
+                        user_agent=self.platform_headers["Windows"]["User-Agent"]
+                    )
+                    
+                    page = context.new_page()
+                    # 减少超时时间
+                    page.set_default_timeout(15000)
+                    page.set_default_navigation_timeout(30000)
+                    
+                    # 设置请求拦截
+                    self.captured_urls.clear()
+                    page.route("**/*", self._handle_route)
+                    
+                    logger.info("尝试从中文官网获取Windows版本信息")
+                    
+                    # 访问中文官网
+                    response = page.goto("https://www.wps.cn/", wait_until="networkidle")
+                    if response and response.status == 200:
+                        # 等待页面加载
+                        page.wait_for_load_state("domcontentloaded")
+                        page.wait_for_load_state("networkidle")
+                        
+                        # 尝试点击下载按钮
+                        try:
+                            download_button = page.locator("text=立即下载").first
+                            if download_button:
+                                logger.info("找到下载按钮，点击下载")
+                                download_button.click()
+                                page.wait_for_timeout(2000)  # 等待下载链接生成
+                                
+                                # 从捕获的URL中查找下载链接
+                                for url in self.captured_urls:
+                                    if url.endswith('.exe') and 'wpscdn.cn' in url:
+                                        download_url = url
+                                        logger.info(f"找到下载链接: {url}")
+                                        
+                                        # 尝试从URL提取版本号
+                                        version_match = re.search(r'WPS_Setup_(\d+)', url)
+                                        if version_match:
+                                            latest_version = version_match.group(1)
+                                            logger.info(f"从下载链接提取版本号: {latest_version}")
+                                        break
+                        except Exception as e:
+                            logger.warning(f"点击下载按钮失败: {str(e)}")
+                    
+                    browser.close()
+            except Exception as e:
+                logger.warning(f"从中文官网获取版本失败: {str(e)}")
+            
+            # 如果从官网未获取到版本，尝试不同的版本号模式
+            if not latest_version:
+                logger.info("从官网未获取到版本，尝试预设版本号")
+                for version in range(21171, 21160, -1):  # 从最新版本开始尝试
+                    # 尝试 32 位版本
+                    url_32 = f"{self.windows_download_base_url}/WPS_Setup_{version}.exe"
+                    # 尝试 64 位版本
+                    url_64 = f"{self.windows_download_base_url}/WPS_Setup_X64_{version}.exe"
+                    
+                    if self._verify_download_url(url_64):
+                        latest_version = str(version)
+                        download_url = url_64
                     
                     # 检查版本是否需要更新
                     if local_info and local_info.get("version") == latest_version:
