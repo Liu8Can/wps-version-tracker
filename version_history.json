@@ -2,6 +2,12 @@
   "windows": [
     {
       "platform": "Windows",
+      "version": "21915",
+      "download_url": "https://official-package.wpscdn.cn/wps/download/WPS_Setup_21915.exe",
+      "update_time": "2025-07-29 17:57:01"
+    },
+    {
+      "platform": "Windows",
       "version": "21171",
       "download_url": "https://official-package.wpscdn.cn/wps/download/WPS_Setup_21171.exe",
       "update_time": "2025-05-31 12:35:33",
