@@ -1,5 +1,8 @@
 platform: macOS
-version: Unknown
-download_url: null
-update_time: '2025-07-28 01:35:47'
-error: 无法获取版本信息或下载链接
+version: 12.1.21861
+build_number: '0'
+download_url: https://package.mac.wpscdn.cn/mac_wps_pkg/wps_installer/WPS_Office_Installer.zip
+update_time: '2025-07-29 17:15:23'
+release_date: '2025-06-20'
+local_file: downloads/macos/WPS_Office_12.1.21861_0_2025-06-20.zip
+file_hash: e298407757d261f6dc8e7d6f3490238095550fd41609699b0411b80a90a60a8a
