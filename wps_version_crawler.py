@@ -525,7 +525,6 @@ class WPSVersionCrawler:
                     if self.downloader.download_file(url_64, save_path):
                         logger.info(f"文件下载完成: {filename}")
                         downloaded_file = save_path
-                    break
                 elif self._verify_download_url(url_32):
                     latest_version = str(version)
                     download_url = url_32
@@ -543,7 +542,6 @@ class WPSVersionCrawler:
                     if self.downloader.download_file(url_32, save_path):
                         logger.info(f"文件下载完成: {filename}")
                         downloaded_file = save_path
-                    break
             
             result = {
                 "platform": "Windows",
