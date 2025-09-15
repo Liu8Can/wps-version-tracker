@@ -1,8 +1,8 @@
 platform: macOS
-version: 12.1.22522
+version: 12.1.22553
 build_number: '0'
 download_url: https://package.mac.wpscdn.cn/mac_wps_pkg/wps_installer/WPS_Office_Installer.zip
-update_time: '2025-08-18 01:23:05'
-release_date: '2025-08-15'
-local_file: downloads/macos/WPS_Office_12.1.22522_0_2025-08-15.zip
+update_time: '2025-09-15 01:14:11'
+release_date: '2025-08-27'
+local_file: downloads/macos/WPS_Office_12.1.22553_0_2025-08-27.zip
 file_hash: 0ce8ea564aee74b15526ee33d3b1b4e8c1a1206802fdca0bbb5509e2c6370cb6
