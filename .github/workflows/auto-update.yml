@@ -1,8 +1,8 @@
 name: WPS Version Auto Update
 
 on:
-  schedule:
-    - cron: '0 0 * * 1'  # 每周一 UTC 00:00 运行
+  # schedule:
+    # - cron: '0 0 * * 1'  # 每周一 UTC 00:00 运行
   workflow_dispatch:      # 允许手动触发
   push:
     branches:
